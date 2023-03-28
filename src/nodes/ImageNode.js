@@ -3,7 +3,6 @@ import * as React from "react";
 import { Suspense } from "react";
 
 const ImageComponent = React.lazy(
-  // @ts-ignore
   () => import("./ImageComponent")
 );
 
@@ -141,13 +140,13 @@ export class ImageNode extends DecoratorNode {
   // View
 
   createDOM(config) {
-    const span = document.createElement("span");
+    const div = document.createElement("span");
     const theme = config.theme;
     const className = theme.image;
     if (className !== undefined) {
-      span.className = className;
+      div.className = className;
     }
-    return span;
+    return div;
   }
 
   updateDOM(){
