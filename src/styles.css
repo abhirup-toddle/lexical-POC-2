@@ -79,7 +79,8 @@ h1 {
   overflow: hidden;
   position: absolute;
   text-overflow: ellipsis;
-  top: 15px;
+  /* top: 15px; */
+  top: 0px;
   left: 10px;
   font-size: 15px;
   user-select: none;
@@ -342,7 +343,7 @@ pre::-webkit-scrollbar-thumb {
 .emoji.happysmile {
   background-image: url(./images/emoji/1F642.png);
 }
-
+/* 
 .toolbar {
   display: flex;
   margin-bottom: 1px;
@@ -464,7 +465,7 @@ pre::-webkit-scrollbar-thumb {
   margin-top: 11px;
   margin-right: 10px;
   pointer-events: none;
-}
+} */
 
 i.chevron-down {
   background-color: transparent;
