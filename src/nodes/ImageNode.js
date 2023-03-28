@@ -6,7 +6,9 @@ const ImageComponent = React.lazy(
   () => import("./ImageComponent")
 );
 
+//for serialization
 function convertImageElement(domNode){
+  console.log('convert ran')
   if (domNode instanceof HTMLImageElement) {
     const { alt, src } = domNode;
     const node = $createImageNode({ altText, src });
@@ -25,67 +27,6 @@ export class ImageNode extends DecoratorNode {
   __caption;
   // Captions cannot yet be used within editor cells
   __captionsEnabled;
-
-  static getType(){
-    return "image";
-  }
-
-  static clone(node) {
-    return new ImageNode(
-      node.__src,
-      node.__altText,
-      node.__maxWidth,
-      node.__width,
-      node.__height,
-      node.__showCaption,
-      node.__caption,
-      node.__captionsEnabled,
-      node.__key
-    );
-  }
-
-  static importJSON(serializedNode) {
-    const {
-      altText,
-      height,
-      width,
-      maxWidth,
-      caption,
-      src,
-      showCaption
-    } = serializedNode;
-    const node = $createImageNode({
-      altText,
-      height,
-      maxWidth,
-      showCaption,
-      src,
-      width
-    });
-    const nestedEditor = node.__caption;
-    console.log("node.__caption:", node.__caption);
-    const editorState = nestedEditor.parseEditorState(caption.editorState);
-    if (!editorState.isEmpty()) {
-      nestedEditor.setEditorState(editorState);
-    }
-    return node;
-  }
-
-  exportDOM(){
-    const element = document.createElement("img");
-    element.setAttribute("src", this.__src);
-    element.setAttribute("alt", this.__altText);
-    return { element };
-  }
-
-  static importDOM(){
-    return {
-      img: (node) => ({
-        conversion: convertImageElement,
-        priority: 0
-      })
-    };
-  }
 
   constructor(
     src,
@@ -109,6 +50,73 @@ export class ImageNode extends DecoratorNode {
     this.__captionsEnabled = captionsEnabled || captionsEnabled === undefined;
   }
 
+  static getType(){
+    return "image";
+  }
+
+
+  //for serialization
+  static clone(node) {
+    return new ImageNode(
+      node.__src,
+      node.__altText,
+      node.__maxWidth,
+      node.__width,
+      node.__height,
+      node.__showCaption,
+      node.__caption,
+      node.__captionsEnabled,
+      node.__key
+    );
+  }
+
+  //for serialization
+  static importJSON(serializedNode) {
+    const {
+      altText,
+      height,
+      width,
+      maxWidth,
+      caption,
+      src,
+      showCaption
+    } = serializedNode;
+    const node = $createImageNode({
+      altText,
+      height,
+      maxWidth,
+      showCaption,
+      src,
+      width
+    });
+    const nestedEditor = node.__caption;
+    const editorState = nestedEditor.parseEditorState(caption.editorState);
+    if (!editorState.isEmpty()) {
+      nestedEditor.setEditorState(editorState);
+    }
+    return node;
+  }
+
+//for serialization
+  exportDOM(){
+    const element = document.createElement("img");
+    element.setAttribute("src", this.__src);
+    element.setAttribute("alt", this.__altText);
+    return { element };
+  }
+
+//for serialization
+  static importDOM(){
+    return {
+      img: (node) => ({
+        conversion: convertImageElement,
+        priority: 0
+      })
+    };
+  }
+
+
+  //for serialization
   exportJSON() {
     return {
       altText: this.getAltText(),
@@ -127,11 +135,13 @@ export class ImageNode extends DecoratorNode {
     width,
     height
   ){
+    console.log('setWidthAndHeight ran');
     const writable = this.getWritable();
     writable.__width = width;
     writable.__height = height;
   }
 
+  //unused for now
   setShowCaption(showCaption) {
     const writable = this.getWritable();
     writable.__showCaption = showCaption;
@@ -140,8 +150,10 @@ export class ImageNode extends DecoratorNode {
   // View
 
   createDOM(config) {
-    const div = document.createElement("span");
+    // Define the DOM element here
+    const div = document.createElement("div");
     const theme = config.theme;
+    console.log('theme: ', theme)
     const className = theme.image;
     if (className !== undefined) {
       div.className = className;
@@ -150,6 +162,8 @@ export class ImageNode extends DecoratorNode {
   }
 
   updateDOM(){
+    // Returning false tells Lexical that this node does not need its 
+    // DOM element replacing with a new copy from createDOM.
     return false;
   }
 
@@ -162,7 +176,6 @@ export class ImageNode extends DecoratorNode {
   }
 
   decorate(){
-    console.log("decorate ran");
     return (
       <Suspense fallback={null}>
         <ImageComponent

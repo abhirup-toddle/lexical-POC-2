@@ -5,7 +5,17 @@ const imageCache = new Set();
 
 function useSuspenseImage(src) {
   if (!imageCache.has(src)) {
+    // return new Promise((resolve) => {
+    //   console.log('returning promise');
+    //   const img = new Image();
+    //   img.src = src;
+    //   img.onload = () => {
+    //     imageCache.add(src);
+    //     resolve(null);
+    //   };
+    // });
     throw new Promise((resolve) => {
+      console.log('throwing promise');
       const img = new Image();
       img.src = src;
       img.onload = () => {
@@ -13,7 +23,9 @@ function useSuspenseImage(src) {
         resolve(null);
       };
     });
+    // throw new Promise((resolve, reject) => reject('x'))
   }
+  console.log('done throwing/resolving');
 }
 
 function LazyImage({
@@ -25,7 +37,6 @@ function LazyImage({
   height,
   maxWidth
 }){
-  console.log('imageRef inside Lazy image: ', imageRef )
   useSuspenseImage(src);
   return (
     <img
@@ -50,22 +61,20 @@ export default function ImageComponent({
   maxWidth
 }){
   const imageRef = useRef(null);
-  console.log('imageRef: ', imageRef)
   return (
-    <Suspense fallback={null}>
-      <>
-        <div>
-          <LazyImage
-            className=""
-            src={src}
-            altText={altText}
-            imageRef={imageRef}
-            width={width}
-            height={height}
-            maxWidth={maxWidth}
-          />
-        </div>
-      </>
+    // <Suspense fallback={null}>
+    <Suspense fallback={<h1>Something failed!</h1>}>
+      <div>
+        <LazyImage
+          className=""
+          src={src}
+          altText={altText}
+          imageRef={imageRef}
+          width={width}
+          height={height}
+          maxWidth={maxWidth}
+        />
+      </div>
     </Suspense>
   );
 }
