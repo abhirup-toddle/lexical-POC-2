@@ -2,18 +2,20 @@ import { createEditor, DecoratorNode } from "lexical";
 import * as React from "react";
 import { Suspense } from "react";
 
+// const ImageComponent = React.lazy(
+//   () => import("./ImageComponent-new")
+// );
 const ImageComponent = React.lazy(
   () => import("./ImageComponent")
 );
 
 //for serialization
 function convertImageElement(domNode){
-  console.log('convert ran')
   if (domNode instanceof HTMLImageElement) {
     const { alt, src } = domNode;
-    const node = $createImageNode({ altText, src });
+    const node = $createImageNode({ altText: alt, src });
     return { node };
-  }
+  } 
   return null;
 }
 
@@ -153,17 +155,18 @@ export class ImageNode extends DecoratorNode {
     // Define the DOM element here
     const div = document.createElement("div");
     const theme = config.theme;
-    console.log('theme: ', theme)
     const className = theme.image;
     if (className !== undefined) {
       div.className = className;
     }
+    console.log('createDOM')
     return div;
   }
 
   updateDOM(){
     // Returning false tells Lexical that this node does not need its 
     // DOM element replacing with a new copy from createDOM.
+    console.log('updateDOM')
     return false;
   }
 
@@ -176,6 +179,7 @@ export class ImageNode extends DecoratorNode {
   }
 
   decorate(){
+    console.log('decorate')
     return (
       <Suspense fallback={null}>
         <ImageComponent
@@ -198,7 +202,8 @@ export class ImageNode extends DecoratorNode {
 export function $createImageNode({
   altText,
   height,
-  maxWidth = 500,
+  // maxWidth = 500,
+  maxWidth,
   captionsEnabled,
   src,
   width,
@@ -206,6 +211,7 @@ export function $createImageNode({
   caption,
   key
 }) {
+  console.log('$createImageNode');
   return new ImageNode(
     src,
     altText,

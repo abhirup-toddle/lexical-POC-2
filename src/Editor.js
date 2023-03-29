@@ -5,12 +5,15 @@ import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 import TreeViewPlugin from "./plugins/TreeViewPlugin";
-import ImageToolbar from './plugins/ImageToolbar';
+import ImageToolbar from './plugins/ImageToolbarPlugin';
 import { ImageNode } from "./nodes/ImageNode";
 import ImagesPlugin from "./plugins/ImagePlugin";
 import Placeholder from './utils/Placeholder';
+import DragDropPaste from "./plugins/DragDropPastePlugin";
+
 
 const editorConfig = {
+  namespace: 'bardhan',
   theme: ExampleTheme,
   onError(error) {
     throw error;
@@ -34,6 +37,7 @@ export default function Editor() {
           <HistoryPlugin />
           <TreeViewPlugin />
           <ImagesPlugin />
+          <DragDropPaste/>
         </div>
       </div>
     </LexicalComposer>

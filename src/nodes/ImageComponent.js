@@ -5,17 +5,7 @@ const imageCache = new Set();
 
 function useSuspenseImage(src) {
   if (!imageCache.has(src)) {
-    // return new Promise((resolve) => {
-    //   console.log('returning promise');
-    //   const img = new Image();
-    //   img.src = src;
-    //   img.onload = () => {
-    //     imageCache.add(src);
-    //     resolve(null);
-    //   };
-    // });
     throw new Promise((resolve) => {
-      console.log('throwing promise');
       const img = new Image();
       img.src = src;
       img.onload = () => {
@@ -23,9 +13,7 @@ function useSuspenseImage(src) {
         resolve(null);
       };
     });
-    // throw new Promise((resolve, reject) => reject('x'))
   }
-  console.log('done throwing/resolving');
 }
 
 function LazyImage({
@@ -78,3 +66,4 @@ export default function ImageComponent({
     </Suspense>
   );
 }
+
