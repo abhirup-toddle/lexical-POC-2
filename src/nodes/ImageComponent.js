@@ -1,6 +1,13 @@
 import * as React from "react";
-import { Suspense, useRef } from "react";
-
+import './ImageNode.css';
+import './image-resizer.css';
+import { Suspense, useRef, useState, useEffect } from "react";
+import ImageResizer from "../utils/ImageResizer";
+import { $getSelection, $setSelection, CLICK_COMMAND, COMMAND_PRIORITY_LOW, KEY_ESCAPE_COMMAND, SELECTION_CHANGE_COMMAND, $isNodeSelection, $getNodeByKey } from "lexical";
+import { mergeRegister } from '@lexical/utils';
+import { useLexicalNodeSelection } from "@lexical/react/useLexicalNodeSelection";
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { $isImageNode } from "./ImageNode";
 const imageCache = new Set();
 
 function useSuspenseImage(src) {
@@ -23,7 +30,7 @@ function LazyImage({
   src,
   width,
   height,
-  maxWidth
+  maxWidth,
 }){
   useSuspenseImage(src);
   return (
@@ -46,24 +53,156 @@ export default function ImageComponent({
   altText,
   width,
   height,
-  maxWidth
+  maxWidth,
+  resizable,
+  nodeKey
 }){
+  const [isSelected, setSelected, clearSelection] =
+    useLexicalNodeSelection(nodeKey);
+  const buttonRef = useRef(null);
+  const [isResizing, setIsResizing] = useState(false);
+  const [editor] = useLexicalComposerContext();
+  const [selection, setSelection] = useState(null);
+  const activeEditorRef = useRef(null);
+
+
   const imageRef = useRef(null);
+  const isFocused = isSelected || isResizing;
+
+
+  const onResizeEnd = (nextWidth,nextHeight) => {
+    // Delay hiding the resize bars for click case
+    setTimeout(() => {
+      setIsResizing(false);
+    }, 200);
+
+    editor.update(() => {
+      const node = $getNodeByKey(nodeKey);
+      if ($isImageNode(node)) {
+        node.setWidthAndHeight(nextWidth, nextHeight);
+      }
+    });
+  };
+
+  const onResizeStart = () => {
+    setIsResizing(true);
+  };
+
+  // const onEscape = useCallback(
+  //   (event) => {
+  //     if (
+  //       activeEditorRef.current === caption ||
+  //       buttonRef.current === event.target
+  //     ) {
+  //       $setSelection(null);
+  //       editor.update(() => {
+  //         setSelected(true);
+  //         const parentRootElement = editor.getRootElement();
+  //         if (parentRootElement !== null) {
+  //           parentRootElement.focus();
+  //         }
+  //       });
+  //       return true;
+  //     }
+  //     return false;
+  //   },
+  //   [caption, editor, setSelected],
+  // );
+  const resizeImage = resizable && $isNodeSelection(selection) && isFocused;
+  console.log('resizeImage: ', resizeImage);
+
+  useEffect(() => {
+    let isMounted = true;
+    const unregister = mergeRegister(
+      editor.registerUpdateListener(({editorState}) => {
+        if (isMounted) {
+          console.log('is Mounted');
+          setSelection(editorState.read(() => $getSelection()));
+        } 
+      }),
+      editor.registerCommand(
+        SELECTION_CHANGE_COMMAND,
+        (_, activeEditor) => {
+          console.log('SELECTION_CHANGE_COMMAND ran');
+          activeEditorRef.current = activeEditor;
+          return false;
+        },
+        COMMAND_PRIORITY_LOW,
+      ),
+      editor.registerCommand(
+        CLICK_COMMAND,
+        (payload) => {
+          const event = payload;
+          if (isResizing) {
+            return true;
+          }
+          if (event.target === imageRef.current) {
+            if (event.shiftKey) {
+              setSelected(!isSelected);
+            } else {
+              clearSelection();
+              setSelected(true);
+            }
+            return true;
+          }
+
+          return false;
+        },
+        COMMAND_PRIORITY_LOW,
+      ),
+      // editor.registerCommand(
+      //   KEY_ESCAPE_COMMAND,
+      //   onEscape,
+      //   COMMAND_PRIORITY_LOW,
+      // ),
+    );
+    return () => {
+      isMounted = false;
+      unregister();
+    };
+  }, [
+    clearSelection,
+    editor,
+    isResizing,
+    isSelected,
+    // nodeKey,
+    // onDelete,
+    // onEnter,
+    // onEscape,
+    setSelected,
+  ]);
+
   return (
-    // <Suspense fallback={null}>
-    <Suspense fallback={<h1>Something failed!</h1>}>
-      <div>
-        <LazyImage
-          className=""
-          src={src}
-          altText={altText}
-          imageRef={imageRef}
-          width={width}
-          height={height}
-          maxWidth={maxWidth}
-        />
-      </div>
+    <Suspense fallback={<FallBack/>}>
+      <>
+        <div>
+          <LazyImage
+            // className=""
+            className={isFocused ? `focused` : null}
+            src={src}
+            altText={altText}
+            imageRef={imageRef}
+            width={width}
+            height={height}
+            maxWidth={maxWidth}
+          />
+        </div>
+
+        {resizeImage && (
+          <ImageResizer
+            editor={editor}
+            imageRef={imageRef}
+            maxWidth={maxWidth}
+            onResizeStart={onResizeStart}
+            onResizeEnd={onResizeEnd}
+          />
+        )}
+      </>
     </Suspense>
   );
 }
 
+function FallBack(){
+  // console.log('something failed');
+  return null
+}
