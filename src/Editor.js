@@ -10,6 +10,8 @@ import { ImageNode } from "./nodes/ImageNode";
 import ImagesPlugin from "./plugins/ImagePlugin";
 import Placeholder from './utils/Placeholder';
 import DragDropPaste from "./plugins/DragDropPastePlugin";
+import { ShapeToggleNode } from "./nodes/ShapeToggleNode";
+import ShapeTogglePlugin from "./plugins/ShapeTogglePlugin";
 
 
 const editorConfig = {
@@ -19,7 +21,8 @@ const editorConfig = {
     throw error;
   },
   nodes: [
-    ImageNode
+    ImageNode,
+    ShapeToggleNode
   ]
 };
 
@@ -37,6 +40,7 @@ export default function Editor() {
           <HistoryPlugin />
           <TreeViewPlugin />
           <ImagesPlugin />
+          <ShapeTogglePlugin />
           <DragDropPaste/>
         </div>
       </div>

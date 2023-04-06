@@ -1,0 +1,17 @@
+.circle-shapeStyle {
+  background-color: steelblue;
+  cursor: pointer;
+  height: 200px;
+  width: 200px;
+  border-radius: 50%;
+  border: 5px solid rgb(64, 64, 64);
+}
+
+.square-shapeStyle {
+  background-color: steelblue;
+  cursor: pointer;
+  height: 200px;
+  width: 200px;
+  border-radius: 0;
+  border: 5px solid rgb(64, 64, 64);
+}
