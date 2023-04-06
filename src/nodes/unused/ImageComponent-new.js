@@ -39,7 +39,7 @@ import {Suspense, useCallback, useEffect, useRef, useState} from 'react';
 // import ContentEditable from '../ui/ContentEditable';
 // import ImageResizer from '../ui/ImageResizer';
 // import Placeholder from '../ui/Placeholder';
-import {$isImageNode} from './ImageNode';
+import {$isImageNode} from '../ImageNode';
 
 const imageCache = new Set();
 

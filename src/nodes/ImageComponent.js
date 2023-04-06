@@ -59,7 +59,6 @@ export default function ImageComponent({
 }){
   const [isSelected, setSelected, clearSelection] =
     useLexicalNodeSelection(nodeKey);
-  const buttonRef = useRef(null);
   const [isResizing, setIsResizing] = useState(false);
   const [editor] = useLexicalComposerContext();
   const [selection, setSelection] = useState(null);
@@ -88,26 +87,7 @@ export default function ImageComponent({
     setIsResizing(true);
   };
 
-  // const onEscape = useCallback(
-  //   (event) => {
-  //     if (
-  //       activeEditorRef.current === caption ||
-  //       buttonRef.current === event.target
-  //     ) {
-  //       $setSelection(null);
-  //       editor.update(() => {
-  //         setSelected(true);
-  //         const parentRootElement = editor.getRootElement();
-  //         if (parentRootElement !== null) {
-  //           parentRootElement.focus();
-  //         }
-  //       });
-  //       return true;
-  //     }
-  //     return false;
-  //   },
-  //   [caption, editor, setSelected],
-  // );
+
   const resizeImage = resizable && $isNodeSelection(selection) && isFocused;
   console.log('resizeImage: ', resizeImage);
 
@@ -150,11 +130,6 @@ export default function ImageComponent({
         },
         COMMAND_PRIORITY_LOW,
       ),
-      // editor.registerCommand(
-      //   KEY_ESCAPE_COMMAND,
-      //   onEscape,
-      //   COMMAND_PRIORITY_LOW,
-      // ),
     );
     return () => {
       isMounted = false;
@@ -165,10 +140,7 @@ export default function ImageComponent({
     editor,
     isResizing,
     isSelected,
-    // nodeKey,
-    // onDelete,
-    // onEnter,
-    // onEscape,
+    nodeKey,
     setSelected,
   ]);
 
@@ -177,7 +149,6 @@ export default function ImageComponent({
       <>
         <div>
           <LazyImage
-            // className=""
             className={isFocused ? `focused` : null}
             src={src}
             altText={altText}
@@ -203,6 +174,5 @@ export default function ImageComponent({
 }
 
 function FallBack(){
-  // console.log('something failed');
   return null
 }
